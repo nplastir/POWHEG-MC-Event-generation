@@ -1,8 +1,12 @@
 # Instructions for the ttb-jets MC event production with POWHEG-BOX-RES
 
 ## Setup
-
-All commands are given relative to a `$base` (set it e.g. via `base=$PWD` in your desired installation directory)
+First set up a directory into the AFS space where everything will be installed
+```
+mkdir MCProduction ; cd MCProduction
+base=$PWD
+```
+All commands are given relative to this `$base`
 
 Set up a CMSSW_10_2_14 environment:
 ```
