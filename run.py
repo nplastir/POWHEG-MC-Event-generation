@@ -17,6 +17,12 @@ init_opts.add_option("--mur", dest="muR", default=1.0, help="muR factor (only fo
 init_opts.add_option("--muf", dest="muF", default=1.0, help="muF factor (only for --init)")
 parser.add_option_group(init_opts)
 
+lhe_opts = optparse.OptionGroup(parser, "LHE Options")
+lhe_opts.add_option("-N", dest="nevents", default=1000, type=int, help="number of events per job")
+lhe_opts.add_option("-d","--decay",dest="ttbar_decay_channel", default=None, help="speficy ttbar decay channel [0L/1L/2L/incl]")
+lhe_opts.add_option("--process-lhe","--lhe",dest="process_lhe", default=False, action="store_true", help="process the output of the LHE step (4) after its completion")
+parser.add_option_group(lhe_opts)
+
 parser.add_option("-w", dest="workdir", default=None, help="path to workdir that is created after initialization (not needed for --init)")
 parser.add_option("-S", dest="stage", default=1, help="parallel stage to run")
 parser.add_option("-X", dest="iteration", default=1, help="iteration to run (relevant for stage 1)")
@@ -24,6 +30,19 @@ parser.add_option("-n", dest="nbatches", default=1000, help="number of batches")
 parser.add_option("--force","-f", dest="force", default=False, action="store_true", help="force re-execution ")
 parser.add_option("--validate","-v", dest="validate", default=False, action="store_true", help="Validate the specified stage/iteration")
 (opts, args) = parser.parse_args()
+
+if opts.process_lhe: 
+    # set stage 4 and validate flags for LHE processing
+    opts.stage = 4
+    opts.validate = True
+elif int(opts.stage) == 4:
+    # make sure a ttbar decay channel is specified
+    if opts.ttbar_decay_channel is None:
+        raise ValueError(
+            f"Need to specify a ttbar decay channel for LHE production [0L/1L/2L/incl]")
+    elif not opts.ttbar_decay_channel in ["0L", "1L", "2L", "incl"]:
+        raise ValueError(
+            f"Invalid choice for ttbar decay channel ({opts.ttbar_decay_channel}). The options are [0L/1L/2L/incl]")
 
 # Initialize in first call
 if opts.init:
@@ -58,9 +77,63 @@ if opts.init:
     print(f"\nCreating run directory at {run_dir}")
     os.mkdir(run_dir)
 
+    # copy powheg input
     powheg_input_path = os.path.join(dir_path, "powheg.input")
     print(f"\nCopying powheg input file to working directory:\n\t{powheg_input_path}")
     os.system(f"cp {opts.input_file} {powheg_input_path}")
+
+    ##Check if this causes the problem with the submission 
+
+    # # get pwg-rwl
+    # rwl_input_path = os.path.join(os.path.dirname(opts.input_file), f"pwg-rwl.dat_{opts.pdf}")
+    # if not os.path.exists(rwl_input_path):
+    #     print(f"ERROR: pwg_rwl.dat file does not exist, expect it to be at\n\t{rwl_input_path}\nto match the given pdf set {opts.pdf}")
+    #     exit()
+    # rwl_path = os.path.join(dir_path, "pwg-rwl.dat")
+
+    # # modify the rwl file according to the scale settings
+    # with open(rwl_input_path, "r") as f:
+    #     lines = f.readlines()
+    # new_file = []
+    # in_head = False
+    # for l in lines:
+    #     new_l = l
+    #     if in_head:
+    #         # modify header lines
+    #         if "renscfact" in l and "facscfact" in l:
+    #             new_l = []
+    #             for elem in l.split(" "):
+    #                 if "renscfact=" in elem or "facscfact" in elem:
+    #                     sc, val = elem.split("=")
+    #                     val = val.replace("d0","").replace("d",".")
+    #                     try:
+    #                         val = float(val)
+    #                     except:
+    #                         raise ValueError(f"Cannot convert {val} to float in line {l}")
+    #                     if "rensc" in sc:
+    #                         val *= float(opts.muR)
+    #                     elif "facsc" in sc:
+    #                         val *= float(opts.muF)
+    #                     val = str(val).replace(".","d")
+    #                     new_l.append(f"{sc}={val}")
+    #                 else:
+    #                     new_l.append(elem)
+    #             new_l = " ".join(new_l)
+    #             print(new_l.strip())
+
+    #     if "name='scale_variation'" in l:
+    #         # enter header
+    #         print("\nModifying scale settings in pwg-rwl file...")
+    #         in_head = True
+    #     if "</weightgroup>" in l: 
+    #         # leave header
+    #         in_head = False
+    #     new_file.append(new_l)
+
+    # with open(rwl_path, "w") as f:
+    #     f.write("".join(new_file))
+    # print(f"\nWrote rwl input file to working directory:\n\t{rwl_path}\n")
+
 
     # generate a yml file with all settings
     settings = {
@@ -102,20 +175,23 @@ if opts.init:
     print(f"\nIntialization is done, you can now start with the first processing stage. For this, run the submit command with the following arguments:")
     print(f"\n-w ./{dir_name} -S 1 -X 1 -n NBATCHES\n")
     print(f"This command submits NBATCHES condor jobs for parallelstage=1 and xgriditeration=1")
-    print(f"The number of events produced per batch job is specified in your powheg.input file")
-    with open(powheg_input_path, "r") as f:
-        lines = f.readlines()
-    nevts = None
-    for l in lines:
-        if l.startswith("numevts"):
-            try:
-                nevts = int(l.split(" ")[1])
-            except: continue
-            break
-    if nevts:
-        print(f"In your file 'numevts' is set to {nevts}")
-    else:
-        print("In your powheg.input file no information about the number of events per job could be found. Check that the file has a setting 'numevts'")
+
+    ## This is obsolete since the numevents is used as an argument at the submission
+
+    # print(f"The number of events produced per batch job is specified in your powheg.input file")
+    # with open(powheg_input_path, "r") as f:
+    #     lines = f.readlines()
+    # nevts = None
+    # for l in lines:
+    #     if l.startswith("numevts"):
+    #         try:
+    #             nevts = int(l.split(" ")[1])
+    #         except: continue
+    #         break
+    # if nevts:
+    #     print(f"In your file 'numevts' is set to {nevts}")
+    # else:
+    #     print("In your powheg.input file no information about the number of events per job could be found. Check that the file has a setting 'numevts'")
     exit()
 
 # run the actual submit after successful initialization
@@ -176,19 +252,21 @@ if opts.validate:
     if not all_exist:
         print(f"Not all files were found in output directory\n\t{settings['run_dir']}")
         print(f"List of jobids with missing files: {missing_ids}")
-        print(f"Validation unsuccessful, exiting.")
-        exit()
+        if not opts.force:
+            print(f"Validation unsuccessful, exiting.")
+            exit()
     else:
         print(f"Validation successful, changing status in workdir...")
-        if int(opts.stage)==1:
-            settings[f"stage1_it"] = int(opts.iteration)
-        else:
-            settings[f"stage{opts.stage}"] = True
+        if not opts.process_lhe:
+            if int(opts.stage)==1:
+                settings[f"stage1_it"] = int(opts.iteration)
+            else:
+                settings[f"stage{opts.stage}"] = True
 
-        with open(settings_path, "w") as yf:
-            yaml.dump(settings, yf, default_flow_style=False, indent=4)
-        print(f"You can now proceeed with the next stage.")
-        exit()
+            with open(settings_path, "w") as yf:
+                yaml.dump(settings, yf, default_flow_style=False, indent=4)
+            print(f"You can now proceeed with the next stage.")
+            exit()
     
 else:
     # check if the output of the requested stage is already available
@@ -200,7 +278,7 @@ else:
         workdir=opts.workdir,
         any_exist=True
         )
-    if any_exist:
+    if any_exist and not opts.force:
         print(f"\nFound output files of stage={opts.stage}, it={opts.iteration} in output directory\n\t{settings['run_dir']}")
         query = input(f"Stop execution (stop/quit/s/q/n) or delete old files (delete/del/d/y)? ")
         if query[0].lower() in ["d","y"]:
@@ -212,7 +290,22 @@ else:
             print("Exiting.") 
         exit()
 
-
+if opts.process_lhe:
+    from lhe_postprocess import lhe_postprocess
+    # make new lhe directory in working area
+    lhe_dir = os.path.join(opts.workdir, "lhe")
+    if not os.path.exists(lhe_dir):
+        os.mkdir(lhe_dir)
+    v = 1
+    while os.path.exists(os.path.join(lhe_dir, f"v{v}")):
+        v += 1
+    out_dir = os.path.abspath(os.path.join(lhe_dir, f"v{v}"))
+    os.mkdir(out_dir)
+    lhe_postprocess(
+        settings=settings,
+        out_dir=out_dir
+        )
+    exit()
 
 ## TODO validation
 ## TODO validate that the number of batches matches the previous iteration
@@ -222,8 +315,9 @@ submit_handler(
     nbatches=int(opts.nbatches),
     stage=int(opts.stage),
     iteration=int(opts.iteration),
+    nevt=int(opts.nevents),
+    ttbardecay=opts.ttbar_decay_channel,
     workdir=opts.workdir,
     finalization=False
     )
-
 

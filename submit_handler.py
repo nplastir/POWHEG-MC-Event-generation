@@ -4,9 +4,9 @@ import os
 from make_seeds import make_seeds
 
 batch_shell_template = """#!/bin/bash
+echo "Running batch job number $1"
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
-# export CMSSW_GIT_REFERENCE=/nfs/dust/cms/user/{gitcache}
 alias cd='cd -P'
 
 startdir=$PWD
@@ -24,7 +24,6 @@ echo 'POWHEG initialized'
 
 # running powheg
 cd {run_dir}
-echo "Running batch job number $1"
 """
 
 submitTemplate = """
@@ -45,31 +44,57 @@ run_as_owner = true
 queue {n}
 """
 
-def submit_handler(settings, nbatches, stage, iteration, workdir, finalization=False):
+def submit_handler(settings, nbatches, stage, iteration, nevt, ttbardecay, workdir, finalization=False):
     run_dir = settings["run_dir"]
     seed_file = make_seeds(nbatches, run_dir)
+
+    if stage==4:
+        # copy rwl file
+        cmd = f"cp {settings['pwg-rwl']} {settings['run_dir']}"
+        os.system(cmd)
 
     # copy powheg.input file and adjust for the current stage
     input_file = os.path.join(settings['run_dir'], 'powheg.input')
     cmd = f"cp {settings['powheg.input']} {input_file}"
     os.system(cmd)
     # add stage to input file
-    print("The following configuration is now in the powheg.input file:\n")
+    n_lines = 6
     if int(stage) < 5: # different for decay stage
         cmd = f'echo "parallelstage {stage}" >> {input_file}'
         os.system(cmd)
         cmd = f'echo "xgriditeration {iteration}" >> {input_file}'
         os.system(cmd)
-        os.system(f"tail -n 8 {input_file}")
-    else:
-        os.system(f"tail -n 6 {input_file}")
+        n_lines += 2
+
+    # add ttbar decay information and nevents per job to powheg config
+    if int(stage) == 4:
+        cmd = f'echo "numevts {nevt}" >> {input_file}'
+        os.system(cmd)
+        # ttdecay
+        if ttbardecay == "0L":
+            decay_id = "00022"
+        elif ttbardecay == "1L":
+            decay_id = "11111"
+        elif ttbardecay == "2L":
+            decay_id = "22200"
+        else: #incl
+            decay_id = "22222"
+        cmd = f'echo "topdecaymode {decay_id}" >> {input_file}'
+        os.system(cmd)
+        n_lines += 2
+        if ttbardecay == "1L":
+            cmd = f'echo "semileptonic 1" >> {input_file}'
+            os.system(cmd)
+            n_lines += 1
+
+    print("The following configuration is now in the powheg.input file:\n")
+    os.system(f"tail -n {n_lines} {input_file}")
 
     # generate a shell script for the batch submit
-    gitcache = os.path.join(os.environ["USER"], ".cmsgit-cache")
     cmssw_base = os.path.join(os.environ["CMSSW_BASE"], "src")
     
     shell_code = batch_shell_template.format(
-        gitcache=gitcache,cmssw_base=cmssw_base, run_dir=run_dir)
+        cmssw_base=cmssw_base, run_dir=run_dir)
 
     if int(stage)==5:
         # decay stage is different
@@ -83,6 +108,8 @@ def submit_handler(settings, nbatches, stage, iteration, workdir, finalization=F
     shell_name = f"stage{stage}"
     if stage==1:
         shell_name += f"_it{iteration}"
+    if stage==4:
+        shell_name += f"__{ttbardecay}"
 
     submit_dir = os.path.join(workdir, "submit")
     if not os.path.exists(submit_dir):
@@ -117,6 +144,7 @@ def submit_handler(settings, nbatches, stage, iteration, workdir, finalization=F
     code = submitTemplate.format(
         arg=os.path.abspath(shell_path),
         dir=os.path.abspath(log_dir),
+        initdir=os.path.abspath(run_dir),
         runtime=runtime_str,
         shell_name=shell_name,
         batchname=batch_name,
