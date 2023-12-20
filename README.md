@@ -44,7 +44,7 @@ make lhef_decay
 The ttbb POWHEG code is now in principle ready to run. We can now also install this repository to ease the event generation and submit to HTCondor:
 ```
 cd $base
-git clone git@github.com:JanvanderLinden/POWHEG-MC-Event-generation.git
+git clone https://github.com/nplastir/POWHEG-MC-Event-generation.git
 ```
 
 For a new production it is recommended to create a new directory now in which you can store everything needed for that production, e.g.
