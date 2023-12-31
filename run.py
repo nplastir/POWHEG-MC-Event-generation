@@ -84,55 +84,55 @@ if opts.init:
 
     ##Check if this causes the problem with the submission 
 
-    # # get pwg-rwl
-    # rwl_input_path = os.path.join(os.path.dirname(opts.input_file), f"pwg-rwl.dat_{opts.pdf}")
-    # if not os.path.exists(rwl_input_path):
-    #     print(f"ERROR: pwg_rwl.dat file does not exist, expect it to be at\n\t{rwl_input_path}\nto match the given pdf set {opts.pdf}")
-    #     exit()
-    # rwl_path = os.path.join(dir_path, "pwg-rwl.dat")
+    # get pwg-rwl
+    rwl_input_path = os.path.join(os.path.dirname(opts.input_file), f"pwg-rwl.dat_{opts.pdf}")
+    if not os.path.exists(rwl_input_path):
+        print(f"ERROR: pwg_rwl.dat file does not exist, expect it to be at\n\t{rwl_input_path}\nto match the given pdf set {opts.pdf}")
+        exit()
+    rwl_path = os.path.join(dir_path, "pwg-rwl.dat")
 
-    # # modify the rwl file according to the scale settings
-    # with open(rwl_input_path, "r") as f:
-    #     lines = f.readlines()
-    # new_file = []
-    # in_head = False
-    # for l in lines:
-    #     new_l = l
-    #     if in_head:
-    #         # modify header lines
-    #         if "renscfact" in l and "facscfact" in l:
-    #             new_l = []
-    #             for elem in l.split(" "):
-    #                 if "renscfact=" in elem or "facscfact" in elem:
-    #                     sc, val = elem.split("=")
-    #                     val = val.replace("d0","").replace("d",".")
-    #                     try:
-    #                         val = float(val)
-    #                     except:
-    #                         raise ValueError(f"Cannot convert {val} to float in line {l}")
-    #                     if "rensc" in sc:
-    #                         val *= float(opts.muR)
-    #                     elif "facsc" in sc:
-    #                         val *= float(opts.muF)
-    #                     val = str(val).replace(".","d")
-    #                     new_l.append(f"{sc}={val}")
-    #                 else:
-    #                     new_l.append(elem)
-    #             new_l = " ".join(new_l)
-    #             print(new_l.strip())
+    # modify the rwl file according to the scale settings
+    with open(rwl_input_path, "r") as f:
+        lines = f.readlines()
+    new_file = []
+    in_head = False
+    for l in lines:
+        new_l = l
+        if in_head:
+            # modify header lines
+            if "renscfact" in l and "facscfact" in l:
+                new_l = []
+                for elem in l.split(" "):
+                    if "renscfact=" in elem or "facscfact" in elem:
+                        sc, val = elem.split("=")
+                        val = val.replace("d0","").replace("d",".")
+                        try:
+                            val = float(val)
+                        except:
+                            raise ValueError(f"Cannot convert {val} to float in line {l}")
+                        if "rensc" in sc:
+                            val *= float(opts.muR)
+                        elif "facsc" in sc:
+                            val *= float(opts.muF)
+                        val = str(val).replace(".","d")
+                        new_l.append(f"{sc}={val}")
+                    else:
+                        new_l.append(elem)
+                new_l = " ".join(new_l)
+                print(new_l.strip())
 
-    #     if "name='scale_variation'" in l:
-    #         # enter header
-    #         print("\nModifying scale settings in pwg-rwl file...")
-    #         in_head = True
-    #     if "</weightgroup>" in l: 
-    #         # leave header
-    #         in_head = False
-    #     new_file.append(new_l)
+        if "name='scale_variation'" in l:
+            # enter header
+            print("\nModifying scale settings in pwg-rwl file...")
+            in_head = True
+        if "</weightgroup>" in l: 
+            # leave header
+            in_head = False
+        new_file.append(new_l)
 
-    # with open(rwl_path, "w") as f:
-    #     f.write("".join(new_file))
-    # print(f"\nWrote rwl input file to working directory:\n\t{rwl_path}\n")
+    with open(rwl_path, "w") as f:
+        f.write("".join(new_file))
+    print(f"\nWrote rwl input file to working directory:\n\t{rwl_path}\n")
 
 
     # generate a yml file with all settings
@@ -143,6 +143,7 @@ if opts.init:
         "muF": float(opts.muF),
         "tag": opts.tag,
         "powheg.input": powheg_input_path,
+        "pwg-rwl": rwl_path,
         "run_dir": run_dir,
         "name": dir_name,
         "stage1": False,

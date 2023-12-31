@@ -40,7 +40,8 @@ error  = {dir}/{shell_name}/run_$(Cluster)_$(ProcId).err
 log    = {dir}/{shell_name}/run_$(Cluster)_$(ProcId).log
 output = {dir}/{shell_name}/run_$(Cluster)_$(ProcId).out
 run_as_owner = true
-
+requirements = (Arch == "X86_64") && ( (OpSysAndVer =?= "AlmaLinux9") || (OpSysAndVer =?= "CentOS7") )
+MY.WantOS    = "el7"
 queue {n}
 """
 
@@ -65,11 +66,12 @@ def submit_handler(settings, nbatches, stage, iteration, nevt, ttbardecay, workd
         cmd = f'echo "xgriditeration {iteration}" >> {input_file}'
         os.system(cmd)
         n_lines += 2
-
+    cmd = f'echo "numevts {nevt}" >> {input_file}'
+    os.system(cmd)
     # add ttbar decay information and nevents per job to powheg config
     if int(stage) == 4:
-        cmd = f'echo "numevts {nevt}" >> {input_file}'
-        os.system(cmd)
+        # cmd = f'echo "numevts {nevt}" >> {input_file}'
+        # os.system(cmd)
         # ttdecay
         if ttbardecay == "0L":
             decay_id = "00022"
@@ -126,7 +128,7 @@ def submit_handler(settings, nbatches, stage, iteration, nevt, ttbardecay, workd
     os.system(f"chmod u+x {shell_path}")
     print(f"\nGenerated shell file for job submission at {shell_path}")
     
-    # determine runtime
+    # determine runtime (HTCondor accepts arguments only with "")
     runtimes = {
         1: (86400, '"tomorrow"'),
         2: (3*86400, '"nextweek"'),
