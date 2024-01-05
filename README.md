@@ -209,5 +209,5 @@ Ater the jobs have finished, merge the LHE files that have been produced:
 cd $production
 python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 4 -n [NBATCHES] -N [NEVENTSPERJOB] --decay [DECAYCHANNEL] --lhe
 ```
-(NOTE: This process takes many hours when the number of events is high. Run it in a tmux!)
+(NOTE: This process takes several hours when the number of events is high. Run it in a tmux!)
 
