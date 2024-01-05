@@ -207,7 +207,7 @@ python3 ../POWHEG-MC-Event-generation/run.py -w ./test__r1.0_f1.0_m172.5_p320900
 Ater the jobs have finished, merge the LHE files that have been produced:
 ```
 cd $production
-python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 4 -n [NBATCHES] -N [NEVENTSPERJOB] --decay [DECAYCHANNEL] -f --lhe
+python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 4 -n [NBATCHES] -N [NEVENTSPERJOB] --decay [DECAYCHANNEL] --lhe
 ```
 
 
