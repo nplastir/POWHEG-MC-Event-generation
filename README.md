@@ -160,6 +160,7 @@ python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 2 -n [NBATC
 ```
 
 3. **Stage 3**
+
 For this stage, it is only required to be run once and with the same number of jobs as in stage 1
 ```
 cd $production
