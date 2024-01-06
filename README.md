@@ -152,15 +152,14 @@ python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 1 -X 3 -n [
 The first parallelstage has to be run at least three times as indicated above but can be continued with more xgridintegrations if needed. (<ins>Recommended 5 xgriditerations</ins>)
 
 2. **Stage 2**
-   
+
 For this stage, it is only required to be run once and with the same number of jobs as in stage 1
 ```
 cd $production
 python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 2 -n [NBATCHES]
 ```
 
-4. **Stage 3**
-
+3. **Stage 3**
 For this stage, it is only required to be run once and with the same number of jobs as in stage 1
 ```
 cd $production
