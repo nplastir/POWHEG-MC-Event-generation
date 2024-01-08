@@ -89,7 +89,7 @@ In addition, in this initialization step, the following factors can be changed:
 - `--mass` specifies the mass of the top quark.
 - `--pdf` specifies the pdf of the proton.
 
-If these factors are not explicitly set, then the run will initialize with the default values: `--muf 1.0 --mur 1.0 --pdf 320900 --mass 172.5`.
+If these factors are not explicitly set, then, the run will initialize with the default values: `--muf 1.0 --mur 1.0 --pdf 320900 --mass 172.5`.
 
 **Example:**
 ```
