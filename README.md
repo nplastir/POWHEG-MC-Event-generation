@@ -172,7 +172,7 @@ python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 3 -n [NBATC
 
 For this stage, make sure that you have initialized the working directory with the appropriate generator settings (mur,muf,mass,pdf).
 
-Then, proceed to copy all the grid files for the LHE run from here
+Then, proceed to copy all the grid files for the LHE run from here (muR=1.0, muF=2.0):
 ```
 cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_nominal/muR1.0_muF2.0/*
 ```
@@ -180,10 +180,6 @@ cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_nominal/muR1.0_muF2
 to the run directory `run__[NAME]__r[MUR]_f[MUF]_m[MASS]_p[PDF]` that has been created inside the `POWHEG-BOX-RES/ttbb/` 
 
 (e.g. `cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_nominal/muR1.0_muF2.0/* $base/POWHEG-BOX-RES/ttbb/run__test__r1.0_f1.0_m172.5_p320900`).
-
-Also, copy this file `/afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/configs_nominal/pwg-rwl.dat_320900` inside the same folder as `pwg-rwl.dat` 
-
-(e.g. `/afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/configs_nominal/pwg-rwl.dat_320900 $base/POWHEG-BOX-RES/ttbb/run__test__r1.0_f1.0_m172.5_p320900/pwg-rwl.dat`).
 
 After everything has been copied inside the run directory, the jobs for the LHE production can be submitted via 
 ```
