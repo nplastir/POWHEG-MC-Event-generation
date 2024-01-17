@@ -89,7 +89,7 @@ In addition, in this initialization step, the following factors can be changed:
 - `--mass` specifies the mass of the top quark.
 - `--pdf` specifies the pdf of the proton.
 
-If these factors are not explicitly set, then the run will initialize with the default values: `--muf 1.0 --mur 1.0 --pdf 320900 --mass 172.5`.
+If these factors are not explicitly set, then, the run will initialize with the default values: `--muf 1.0 --mur 1.0 --pdf 320900 --mass 172.5`.
 
 **Example:**
 ```
@@ -152,14 +152,14 @@ python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 1 -X 3 -n [
 The first parallelstage has to be run at least three times as indicated above but can be continued with more xgridintegrations if needed. (<ins>Recommended 5 xgriditerations</ins>)
 
 2. **Stage 2**
-   
+
 For this stage, it is only required to be run once and with the same number of jobs as in stage 1
 ```
 cd $production
 python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 2 -n [NBATCHES]
 ```
 
-4. **Stage 3**
+3. **Stage 3**
 
 For this stage, it is only required to be run once and with the same number of jobs as in stage 1
 ```
@@ -181,6 +181,13 @@ to the run directory `run__[NAME]__r[MUR]_f[MUF]_m[MASS]_p[PDF]` that has been c
 
 (e.g. `cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_nominal/muR1.0_muF2.0/* $base/POWHEG-BOX-RES/ttbb/run__test__r1.0_f1.0_m172.5_p320900`).
 
+<<<<<<< HEAD
+=======
+Also, copy this file `/afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/configs_nominal/pwg-rwl.dat_320900` inside the same folder as `pwg-rwl.dat` 
+
+(e.g. `cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/configs_nominal/pwg-rwl.dat_320900 $base/POWHEG-BOX-RES/ttbb/run__test__r1.0_f1.0_m172.5_p320900/pwg-rwl.dat`).
+
+>>>>>>> 550496f242a61a1328837420ea835d3f567fe4e2
 After everything has been copied inside the run directory, the jobs for the LHE production can be submitted via 
 ```
 cd $production
@@ -205,5 +212,5 @@ Ater the jobs have finished, merge the LHE files that have been produced:
 cd $production
 python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 4 -n [NBATCHES] -N [NEVENTSPERJOB] --decay [DECAYCHANNEL] --lhe
 ```
-
+(NOTE: This process takes several hours when the number of events is high. Run it in a tmux!)
 
