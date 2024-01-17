@@ -181,13 +181,6 @@ to the run directory `run__[NAME]__r[MUR]_f[MUF]_m[MASS]_p[PDF]` that has been c
 
 (e.g. `cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_nominal/muR1.0_muF2.0/* $base/POWHEG-BOX-RES/ttbb/run__test__r1.0_f1.0_m172.5_p320900`).
 
-<<<<<<< HEAD
-=======
-Also, copy this file `/afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/configs_nominal/pwg-rwl.dat_320900` inside the same folder as `pwg-rwl.dat` 
-
-(e.g. `cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/configs_nominal/pwg-rwl.dat_320900 $base/POWHEG-BOX-RES/ttbb/run__test__r1.0_f1.0_m172.5_p320900/pwg-rwl.dat`).
-
->>>>>>> 550496f242a61a1328837420ea835d3f567fe4e2
 After everything has been copied inside the run directory, the jobs for the LHE production can be submitted via 
 ```
 cd $production
