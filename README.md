@@ -158,13 +158,23 @@ For this stage, it is only required to be run once and with the same number of j
 cd $production
 python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 2 -n [NBATCHES]
 ```
+This stage will take a while to finish. When all jobs are completed, you need to validate them before moving to the next stage. 
+```
+cd $production
+python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 2 -n [NBATCHES] --validate
+```
 
 3. **Stage 3**
 
-For this stage, it is only required to be run once and with the same number of jobs as in stage 1
+After stage 2 has finished, submit **one** job 
 ```
 cd $production
-python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 3 -n [NBATCHES]
+python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 3 -n 1
+```
+When this job is finished, run again with the same number of jobs as in stage 1 
+```
+cd $production
+python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 3 -X 2 -n [NBATCHES]
 ```
 ----------
 
