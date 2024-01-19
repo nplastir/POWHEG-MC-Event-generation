@@ -247,12 +247,16 @@ if opts.validate:
         if not opts.process_lhe:
             if int(opts.stage)==1:
                 settings[f"stage1_it"] = int(opts.iteration)
+                if int(opts.iteration) >= 3:
+                    settings[f"stage{opts.stage}"] = True
+                else:
+                    print(f"Please proceed with the next xgriditeration before the next stage.")
             else:
                 settings[f"stage{opts.stage}"] = True
 
             with open(settings_path, "w") as yf:
                 yaml.dump(settings, yf, default_flow_style=False, indent=4)
-            print(f"You can now proceeed with the next stage.")
+            print(f"You can now proceed with the next stage.")
             exit()
     
 else:
