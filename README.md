@@ -174,6 +174,13 @@ After stage 2 has finished, submit again with the same number of jobs as in prev
 cd $production
 python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 3 -n [NBATCHES]
 ```
+This stage will only take a couple minutes in order to finish. When it is finished, validate:
+```
+cd $production
+python3 ../POWHEG-MC-Event-generation/run.py -w [PATH_TO_WORKDIR] -S 3 -n [NBATCHES] --validate
+```
+If the validation was successful, check if at least one file named 'pwgfullgrid-btl-xxxx' exists as well as at least one 'pwgfullgrid-rm-xxxx' inside the run folder, before continuing to the LHE production. (The job number for these files doesn't matter).
+
 ----------
 
 ### LHE file production
