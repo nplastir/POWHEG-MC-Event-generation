@@ -202,6 +202,9 @@ cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_nominal/muR1.0_muF2
 cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_hdampUP/muR1.0_muF1.0/*
 ```
 - muR=1.0, muF=2.0 for hdampUp:
+```
+cp /afs/cern.ch/user/n/nplastir/public/grids_hdampUP/muR1.0_muF2.0/*
+```
 - muR=1.0, muF=1.0 for hdampDOWN:
 ```
 cp /afs/cern.ch/work/v/vanderli/public/ttbb-lhe-inputs/grids_hdampDOWN/muR1.0_muF1.0/*
